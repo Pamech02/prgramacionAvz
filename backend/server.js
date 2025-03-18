@@ -1,15 +1,15 @@
 const express = require("express");
 const connectDB = require("./db");
-const userRoutes = require("./routes/users");
+const userRoutes = require("./routes/habits");
 
 require("dotenv").config();
 
 const server = express();
 
 server.use(express.json());
-// connectDB();
+connectDB();
 
-server.use("/api/users", userRoutes);
+server.use("/api", userRoutes);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
