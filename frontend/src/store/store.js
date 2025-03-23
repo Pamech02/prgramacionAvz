@@ -5,3 +5,5 @@ export const store = configureStore({
     habits: habitReducer,
   },
 });
+
+export default store;
