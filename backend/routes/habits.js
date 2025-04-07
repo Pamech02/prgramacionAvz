@@ -1,13 +1,31 @@
 const express = require("express");
 const Habit = require("../models/Habit");
+const jwt = require("jsonwebtoken");
+const moongose = require("mongoose")
 
 const router = express.Router();
 
-router.get("/habits", async (req, res) => {
+const checkToken = (req, res, next)=>{
+  const token = req.header('Authorization')
+  if(!token) return res.status(401).json({message:'Acceso denegado'})
+    try {
+      const formattedToken = token.replace('Bearer ', '');
+      const verified = jwt.verify(formattedToken, process.env.JWT_SECRET);
+      req.user = verified;
+      next()
+    } catch (error) {
+      console.log(error)
+      res.status(401).json({ message: 'Acceso denegado' });
+    }
+}
+
+router.get("/habits", checkToken, async (req, res) => {
   try {
-    const habits = await Habit.find();
+    let userId = req.user && req.user.userId ? req.user.userId : res.status(500).json({message:'Error obteniendo habitos'})
+    const habits = await Habit.find({'userId': new moongose.Types.ObjectId(userId)});
     res.json(habits);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: "Error obteniendo habitos" });
   }
 });
