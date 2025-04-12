@@ -12,6 +12,7 @@ const checkToken = (req, res, next)=>{
       const formattedToken = token.replace('Bearer ', '');
       const verified = jwt.verify(formattedToken, process.env.JWT_SECRET);
       req.user = verified;
+      console.log('middleware',req.user)
       next()
     } catch (error) {
       console.log(error)
@@ -30,10 +31,11 @@ router.get("/habits", checkToken, async (req, res) => {
   }
 });
 
-router.post("/habits", async (req, res) => {
+router.post("/habits", checkToken, async (req, res) => {
   try {
     const {title, description} = req.body;
-    const habit = new Habit({title, description})
+    const userId = req.user.userId; 
+    const habit = new Habit({ title, description, userId });
     await habit.save();
     res.json(habit);
   } catch (error) {
