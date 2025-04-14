@@ -16,14 +16,39 @@ router.get("/users", async (req, res) => {
 
 router.post("/users", async (req, res) => {
   try {
-    const {username, password} = req.body;
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
-    const newUser = new User({username, password:hashedPassword})
+    const { username, password } = req.body;
+
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ error: "El usuario ya existe" });
+    }
+
+    // Hashear la contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Crear y guardar el nuevo usuario
+    const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
-    res.json(newUser);
+
+    // Generar el token JWT
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // (Opcional) Establecer la cookie
+    res.cookie("habitToken", token, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
+    });
+
+    // Enviar el token en la respuesta
+    res.status(201).json({ message: "Usuario creado exitosamente", token });
+
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ message: "Error creando usuario" });
   }
 });
