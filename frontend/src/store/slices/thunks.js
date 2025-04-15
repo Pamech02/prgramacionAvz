@@ -4,7 +4,7 @@ import { loginStart, loginSuccess, loginFailure, logout } from "./userSlice";
 export const getHabits = (token) => {
   return async (dispatch) => {
       try {
-          const resp = await fetch('http://localhost:5000/api/habits', {
+          const resp = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/habits`, {
               method: 'GET',
               headers: {
                   'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ export const getHabits = (token) => {
 export const loginUser = (username, password) => async (dispatch) => {
     dispatch(loginStart());
     try {
-      const response = await fetch("http://localhost:5000/api/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export const loginUser = (username, password) => async (dispatch) => {
   export const registerUser = (username, password) => async (dispatch) => {
     dispatch(loginStart());
     try {
-      const response = await fetch("http://localhost:5000/api/users", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

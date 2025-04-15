@@ -14,6 +14,10 @@ server.use(cors());
 server.use(express.json());
 connectDB();
 
+server.get('/', (req,res)=>{
+  res.send("Programacion Avanzada")
+})
+
 server.use("/api", habitRoutes);
 server.use("/api", userRoutes);
 

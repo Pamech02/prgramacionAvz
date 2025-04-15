@@ -11,7 +11,7 @@ export const Habits = () => {
 
     const updateHabit = async (id) => {
         try {
-            const resp = await fetch(`http://localhost:5000/api/habits/markasdone/${id}`, {
+            const resp = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/habits/markasdone/${id}`, {
                 method: 'PATCH',
             });
             const data = await resp.json();
@@ -37,7 +37,7 @@ export const Habits = () => {
 
 
     const createHabit = async (title, description) => {
-        await fetch(`http://localhost:5000/api/habits/`, {
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/habits/`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
@@ -48,6 +48,16 @@ export const Habits = () => {
                 "description": description
             })
         })
+    }
+
+    const deleteHabit = async (id) => {
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/habits/${id}`, {
+            method: 'DELETE',
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        dispatch(getHabits(token));
     }
 
     const [credentials, setCredentials] = useState({
@@ -119,7 +129,7 @@ export const Habits = () => {
                     {loading ? "Cargando..." : "Crear nuevo habito"}
                 </button>
             </form>
-            <div className="w-full max-w-sm">
+            <div className="">
                 {habits.length === 0 ? (
                     <div className="text-center text-sm text-gray-500">
                         No tienes hábitos registrados aún.
@@ -142,6 +152,12 @@ export const Habits = () => {
                                     >
                                         DONE
                                     </button>
+                                    <button
+                                        className="ml-3 px-1 py-1 text-sm text-white bg-red-500 rounded cursor-pointer"
+                                        onClick={() => deleteHabit(item._id)}
+                                    >
+                                        BORRAR
+                                    </button>
                                     {messages[item._id] && (
                                         <p className="mt-2 text-sm text-yellow-400">
                                             {messages[item._id]}
@@ -152,7 +168,7 @@ export const Habits = () => {
                         </ol>
                     </>
                 )}
-                <button className="p-2 rounded-lg font-semibold text-white bg-red-500 cursor-pointer"
+                <button className="p-2 rounded-lg font-semibold text-white bg-amber-500 cursor-pointer"
                     onClick={handleLogout}>
                     LOGOUT
                 </button>
